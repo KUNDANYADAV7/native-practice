@@ -1,6 +1,6 @@
 // src/screens/HomeScreen.js
 import React, { useEffect, useState } from 'react';
-import { View, Text, Button } from 'react-native';
+import { View, Text, Button,StyleSheet } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
 import { signOut } from '../firebase/authService'; // Adjust the import according to your auth service path
@@ -36,11 +36,23 @@ export default function HomeScreen() {
   };
 
   return (
-    <View style={{ flex: 1 }}>
-      <View style={{ alignItems: 'center', justifyContent: 'center', marginTop: 20 }}>
+    <View style={ styles.container }>
+      <View style={ styles.body }>
         <Text>Welcome, {userName}</Text>
         <Button title="Logout" onPress={handleLogout} />
       </View>
     </View>
   );
 }
+
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+  body: {
+    alignItems: 'center', 
+    justifyContent: 'center', 
+    marginTop: 20
+  },
+});
