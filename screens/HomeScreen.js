@@ -1,58 +1,61 @@
-// src/screens/HomeScreen.js
 import React, { useEffect, useState } from 'react';
-import { View, Text, Button,StyleSheet } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useNavigation } from '@react-navigation/native';
-import { signOut } from '../firebase/authService'; // Adjust the import according to your auth service path
+import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
+import { useNavigation, DrawerActions } from '@react-navigation/native';
+import { useAuth } from '../Context/AuthContext';
+import Icon from 'react-native-vector-icons/MaterialIcons';
 
-export default function HomeScreen() {
-  const [userName, setUserName] = useState('');
+const logoUrl = "https://aqad.ae/wp-content/uploads/2023/07/aqad-logo-1.png";
+
+export default function HomeScreen({ isDrawerOpen }) {
   const navigation = useNavigation();
+  const { user } = useAuth();
+  const [userName, setUserName] = useState(user?.displayName || 'User');
 
   useEffect(() => {
-    const fetchUserData = async () => {
-      try {
-        const userData = await AsyncStorage.getItem('userData');
-        if (userData) {
-          const user = JSON.parse(userData);
-          setUserName(user.displayName || 'User');
-        }
-      } catch (error) {
-        console.error("Error fetching user data: ", error);
-      }
-    };
-
-    fetchUserData();
-  }, []);
-
-  const handleLogout = async () => {
-    try {
-      await signOut();
-      await AsyncStorage.removeItem('userData');
-      navigation.navigate('Login'); // Adjust the route name as per your login screen
-    } catch (error) {
-      console.error("Logout error: ", error);
+    if (user) {
+      setUserName(user.displayName || 'User');
     }
-  };
+  }, [user]);
 
   return (
-    <View style={ styles.container }>
-      <View style={ styles.body }>
-        <Text>Welcome, {userName}</Text>
-        <Button title="Logout" onPress={handleLogout} />
+    <View style={styles.container}>
+      <View style={[styles.header, isDrawerOpen && { backgroundColor: '#87CEEB' }]}>
+        <Image source={{ uri: logoUrl }} style={styles.logo} />
+        <TouchableOpacity onPress={() => navigation.dispatch(DrawerActions.toggleDrawer())}>
+          <Icon name="menu" size={30} />
+        </TouchableOpacity>
+      </View>
+      <View style={styles.body}>
+        <Text style={styles.welcomeText}>Welcome, {userName}</Text>
       </View>
     </View>
   );
 }
 
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 15,
+    height: 60,
+    backgroundColor: '#fff',
+    justifyContent: 'space-between',
+  },
+  logo: {
+    width: 120,
+    height: 40,
+    resizeMode: 'contain',
+  },
   body: {
-    alignItems: 'center', 
-    justifyContent: 'center', 
-    marginTop: 20
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  welcomeText: {
+    fontSize: 20,
+    marginBottom: 20,
   },
 });
